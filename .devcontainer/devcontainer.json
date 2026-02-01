@@ -2,7 +2,7 @@
     "name": "Ubuntu Docker Image",
     "build": {
         "context": "..",
-        "dockerfile": "../ubuntu-cmake.Dockerfile",
+        "dockerfile": "Dockerfile",
         "options": [
             "--platform=linux/amd64"
         ]
@@ -27,7 +27,7 @@
     "onCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/scripts/download_toolchain.sh",
     "features": {
         "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/common-utils:2.5.2": {
+        "ghcr.io/devcontainers/features/common-utils:2.5.6": {
             "username": "none",
             "installZsh": "true",
             "configureZshAsDefaultShell": "true",
