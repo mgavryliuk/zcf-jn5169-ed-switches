@@ -1,6 +1,8 @@
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Devices](#devices)
+- [Flashing](#flashing)
+- [Pairing after flashing](pairing-after-flashing)
 - [JN5169 Documentation](#jn5169-documentation)
 
 # Overview
@@ -33,6 +35,67 @@ This project uses VS Code and [Dev Containers](https://code.visualstudio.com/doc
 | WXKG06LM | Wireless remote switch D1 (single rocker) | [Documentation](firmwares/WXKG06LM/README.md) | `WXKG06LM` |
 | WXKG07LM | Wireless remote switch D1 (double rocker) | [Documentation](firmwares/WXKG07LM/README.md) | `WXKG07LM` |
 | WXKG11LM | Wireless mini switch | [Documentation](firmwares/WXKG11LM/README.md) | `WXKG11LM` |
+
+# Flashing
+> ⚠️ **Important**
+> - FTDI **must be set to 3.3V**. Using 5V will permanently damage the device.
+> - Do not power the device from any other source while FTDI 3.3V is connected.
+> - `MISO → GND` is required **only during bootloader entry**.
+> - Flashing works only on Windows and is not possible to a chip with `CRP_LEVEL2` protection set
+
+1. Connect the FTDI adapter
+
+| Target Pad | FTDI Pin | Notes |
+|------------|----------|-------|
+| **TDO**    | **RX**   | Data from device to FTDI |
+| **TDI**    | **TX**   | Data from FTDI to device |
+| **MISO**   | **GND**  | Connect to GND **only during bootloader mode** |
+| **DC3V**   | **3.3V** | Power from FTDI (ensure FTDI is set to 3.3V) |
+| **RESETN** | **GND (via button)** | Pulling RESETN low resets the device. Use a momentary button, not a permanent short. |
+| **GND**    | **GND**  | Common ground |
+
+2. Download and install [JN51xx Production Flash Programmer](https://www.nxp.com/downloads/en/software-development-kits/JN-SW-4107.zip)
+
+3. Flash the firmware
+```powershell
+# Find your FTDI port
+PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -l
+Available connections:
+COM5
+
+# Check device config
+PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -V 0 -s COM5 --deviceconfig
+  COM5: Detected JN5169 with MAC address 00:15:8D:00:01:B9:6A:FE
+  COM5: Device configuration: JTAG_DISABLE_CPU,VBO_200,CRP_LEVEL1,EXTERNAL_FLASH_NOT_ENCRYPTED,EXTERNAL_FLASH_LOAD_ENABLE
+
+# Flash the firmware. Example (do not copy blindly):
+PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -V 0 -s COM5 -f D:\Programs\bstudio_nxp\workspace\Aqara_D1_ALT\build\src\AQARA_D1_ALT.bin
+```
+> If flashing fails, check:
+> - `MISO → GND` was connected during bootloader entry
+> - The FTDI adapter connected properly
+> - The correct FTDI COM port is used (`JN51xxProgrammer.exe -l`)
+
+
+# Pairing after flashing
+
+1. **Remove the old device** from Zigbee2MQTT and restart Zigbee2MQTT.
+
+2. **Add the custom converter**
+   Copy the converter file from this repository into your Zigbee2MQTT `external_converters` directory and restart Zigbee2MQTT again.
+
+3. **Permin join in Zigbee2MQTT**
+
+4. **Start pairing mode**
+   Press and hold **both buttons** (or the single button on 1-button models), until the LED starts **rapidly blinking**.
+
+5. **Bind the Power Configuration cluster**
+    > Do this **even if a binding already exists** — otherwise battery reports will not work.
+    Go to the device **Bind** tab and press **Bind** with the following settings:
+
+   - Source endpoint: `1`
+   - Destination endpoint: `1`
+   - Cluster: `genPowerCfg`
 
 # JN5169 Documentation
 [Product page](https://www.nxp.com/products/JN5169)</br>
