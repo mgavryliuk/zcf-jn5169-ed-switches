@@ -5,3 +5,5 @@ toolchain/**
 
 .DS_Store
 .vscode
+
+.devcontainer/devcontainer-lock.json
