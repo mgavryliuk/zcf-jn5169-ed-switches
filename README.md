@@ -98,24 +98,17 @@ PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -V 0 -s COM5 -f D:\P
    - Cluster: `genPowerCfg`  
 
 
-# Troubleshooting: device fails to join (`Failed To Join 0xad`)
+# PDM records from the stock firmware
 
 The flash programmer only rewrites the flash. PDM records left in EEPROM by the stock Xiaomi firmware survive, and on devices with `CRP_LEVEL1` the EEPROM can't be erased with `--eraseeeprom` either (`Code protection prevents loading extension binary into RAM`).
 
-Stale records can prevent the device from joining: in the debug log the device associates, polls (`ZPS_EVENT_NWK_POLL_CONFIRM: 235`) and then fails with `APP-ZDO: Failed To Join 0xad` (APS security failure), or it never shows up in Zigbee2MQTT at all.
+Stale records can prevent the device from joining: in the debug log the device associates, polls (`ZPS_EVENT_NWK_POLL_CONFIRM: 235`) and then fails with `APP-ZDO: Failed To Join 0xad` (APS security failure), or it silently rejoins with the network state of the stock firmware.
 
-To clean the PDM, build a one-shot firmware that erases all PDM records at boot:
+To avoid this, the firmware stores a PDM format version record (`PDM_ID_APP_FORMAT`). On boot, if this record is missing or holds a different value, all PDM records are wiped before the stack starts. This happens once on the first boot after flashing, so no extra step is needed.
 
-```bash
-cmake -S . -B build-wipe -DCMAKE_TOOLCHAIN_FILE=toolchain/CMakeToolchain.cmake -DTARGET=WXKG06LM -DENABLE_DEBUG=ON -DWIPE_PDM_ON_BOOT=ON
-cmake --build build-wipe --target WXKG06LM.bin
-```
+> **Note:** devices already running an older build of this firmware don't have this record either, so they are reset once after updating and must be paired again.
 
-1. Flash the wipe build and boot the device once. The UART log shows `APP INIT: PDM wiped (WIPE_PDM_ON_BOOT build)`.
-2. Flash the regular build. **Don't pair with the wipe build**: it forgets the network at every boot.
-3. Pair as described above.
-
-`-DENABLE_DEBUG=ON` enables UART debug output (115200 8N1) in any build.
+`-DENABLE_DEBUG=ON` enables UART debug output (115200 8N1).
 
 
 # JN5169 Documentation
