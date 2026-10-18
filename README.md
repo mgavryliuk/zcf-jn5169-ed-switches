@@ -97,6 +97,15 @@ PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -V 0 -s COM5 -f D:\P
    - Destination endpoint: `1`  
    - Cluster: `genPowerCfg`  
 
+## Factory reset behavior
+
+When the device receives a Zigbee Leave request without rejoin
+(for example, when it is removed from Zigbee2MQTT), it is returned
+to factory state.
+
+This resets both the Zigbee network state and device configuration,
+including operation mode and prevent-reset settings. After pairing
+the device again, these settings must be configured again if needed.
 
 # PDM records from the stock firmware
 
@@ -109,7 +118,6 @@ To avoid this, the firmware stores a PDM format version record (`PDM_ID_APP_FORM
 > **Note:** devices already running an older build of this firmware don't have this record either, so they are reset once after updating and must be paired again.
 
 `-DENABLE_DEBUG=ON` enables UART debug output (115200 8N1).
-
 
 # JN5169 Documentation
 [Product page](https://www.nxp.com/products/JN5169)</br>
