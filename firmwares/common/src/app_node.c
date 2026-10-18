@@ -99,16 +99,20 @@ PUBLIC void APP_vBdbCallback(BDB_tsBdbEvent *psBdbEvent)
     }
 }
 
-PUBLIC void APP_vFactoryResetRecords(void)
+PUBLIC void APP_vResetNetworkRecords(void)
 {
-    DBG_vPrintf(TRACE_NODE, "NODE: Factory Reset\n");
     ZPS_eAplAibSetApsUseExtendedPanId(0);
     ZPS_vDefaultStack();
     ZPS_vSetKeys();
     eNodeState = E_NO_NETWORK;
     PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
     ZPS_vSaveAllZpsRecords();
+}
 
+PUBLIC void APP_vFactoryResetRecords(void)
+{
+    DBG_vPrintf(TRACE_NODE, "NODE: Factory Reset\n");
+    APP_vResetNetworkRecords();
     vResetConfigurationCluster();
     DBG_vPrintf(TRACE_NODE, "NODE: Factory Reset - Finished. Reseting device...\n");
 }
