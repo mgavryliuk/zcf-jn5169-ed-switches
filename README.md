@@ -98,6 +98,19 @@ PS C:\NXP\ProductionFlashProgrammer> .\JN51xxProgrammer.exe -V 0 -s COM5 -f D:\P
    - Cluster: `genPowerCfg`  
 
 
+# PDM records from the stock firmware
+
+The flash programmer only rewrites the flash. PDM records left in EEPROM by the stock Xiaomi firmware survive, and on devices with `CRP_LEVEL1` the EEPROM can't be erased with `--eraseeeprom` either (`Code protection prevents loading extension binary into RAM`).
+
+Stale records can prevent the device from joining: in the debug log the device associates, polls (`ZPS_EVENT_NWK_POLL_CONFIRM: 235`) and then fails with `APP-ZDO: Failed To Join 0xad` (APS security failure), or it silently rejoins with the network state of the stock firmware.
+
+To avoid this, the firmware stores a PDM format version record (`PDM_ID_APP_FORMAT`). On boot, if this record is missing or holds a different value, all PDM records are wiped before the stack starts. This happens once on the first boot after flashing, so no extra step is needed.
+
+> **Note:** devices already running an older build of this firmware don't have this record either, so they are reset once after updating and must be paired again.
+
+`-DENABLE_DEBUG=ON` enables UART debug output (115200 8N1).
+
+
 # JN5169 Documentation
 [Product page](https://www.nxp.com/products/JN5169)</br>
 [Support Resources for JN516x MCUs](https://www.nxp.com/products/wireless-connectivity/zigbee/support-resources-for-jn516x-mcus:SUPPORT-RESOURCES-JN516X-MCUS)</br>
