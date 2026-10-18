@@ -22,6 +22,7 @@ PUBLIC void APP_vInitialiseNode(void);
 PUBLIC bool_t bNodeJoined(void);
 PUBLIC teNodeState eGetNodeState(void);
 PUBLIC void APP_vBdbCallback(BDB_tsBdbEvent *psBdbEvent);
+PUBLIC void APP_vResetNetworkRecords(void);
 PUBLIC void APP_vFactoryResetRecords(void);
 
 #endif /* APP_NODE_H */

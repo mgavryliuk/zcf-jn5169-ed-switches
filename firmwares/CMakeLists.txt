@@ -31,6 +31,11 @@ add_compile_definitions(
     BUILD_NUMBER="${BUILD_NUMBER}"
 )
 
+option(ENABLE_DEBUG "Enable UART debug output" OFF)
+if(ENABLE_DEBUG)
+    add_compile_definitions(DBG_ENABLE)
+endif()
+
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
 set(SDK_COMPONENTS_BASE_DIR ${SDK_PREFIX}/Components)
 

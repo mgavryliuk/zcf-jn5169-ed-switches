@@ -76,7 +76,8 @@ PUBLIC void APP_vProcessEvents(void)
         case APP_RESET_DEVICE_EVENT:
             if (eGetNodeState() == E_NO_NETWORK)
             {
-                DBG_vPrintf(TRACE_EVENTS, "APP EVENTS: Device is not in network. Starting NWK Steering...\n");
+                DBG_vPrintf(TRACE_EVENTS, "APP EVENTS: Device is not in network. Resetting network records before NWK Steering...\n");
+                APP_vResetNetworkRecords();
                 if (sDeviceConfig.sResetButtonConfig.bHasLed) {
                     APP_vBlinkLed(sDeviceConfig.sResetButtonConfig.u32LedMask, 5);
                 }
